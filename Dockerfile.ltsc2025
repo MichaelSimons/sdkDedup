@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0-nanoserver-ltsc2025
+FROM mcr.microsoft.com/dotnet/sdk:10.0-windowsservercore-ltsc2025
 WORKDIR /app
 
 # Copy project file and restore dependencies

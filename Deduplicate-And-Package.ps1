@@ -56,6 +56,7 @@ Write-Host "=== ENVIRONMENT INFO ===" -ForegroundColor Cyan
 # OS Information
 Write-Host "OS: $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription)"
 Write-Host "OS Architecture: $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
+Write-Host "OS Version: $([System.Environment]::OSVersion)"
 Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
 
 # Windows-specific information
