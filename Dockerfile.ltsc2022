@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0-nanoserver-ltsc2022
+WORKDIR /app
+
+# Copy project file and restore dependencies
+COPY sdkDedup.csproj .
+RUN dotnet restore
+
+# Copy source code and build
+COPY . .
+RUN dotnet build -c Release --no-restore
+
+# Copy PowerShell script
+COPY Deduplicate-And-Package.ps1 .
+
+# Set the working directory for output
+WORKDIR /output
+
+# Example usage:
+# docker build -f Dockerfile.ltsc2022 -t sdkdedup:ltsc2022 .
+#
+# Run deduplication and create tarball:
+# docker run --rm -v C:\output:C:\output sdkdedup:ltsc2022 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet\sdk\10.0.100" -OutputPath C:\output -UseHardLinks
+#
+# Or run the tool directly:
+# docker run --rm sdkdedup:ltsc2022 dotnet C:\app\bin\Release\net10.0\sdkDedup.dll C:\path\to\sdk --hard-links
