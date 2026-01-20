@@ -15,7 +15,7 @@
 .PARAMETER UseHardLinks
     Use hard links instead of symbolic links
 
-.PARAMETER Verbose
+.PARAMETER VerboseOutput
     Enable verbose output
 
 .EXAMPLE
@@ -31,7 +31,7 @@ param(
 
     [switch]$UseHardLinks,
 
-    [switch]$Verbose
+    [switch]$VerboseOutput
 )
 
 $ErrorActionPreference = "Stop"
@@ -74,7 +74,7 @@ try {
     if ($UseHardLinks) {
         $dedupArgs += "--hard-links"
     }
-    if ($Verbose) {
+    if ($VerboseOutput) {
         $dedupArgs += "--verbose"
     }
 

@@ -145,7 +145,7 @@ The `Deduplicate-And-Package.ps1` script provides an end-to-end workflow for cre
 - **`-SourceSdkPath`** (required) - Path to the source SDK installation
 - **`-OutputPath`** (required) - Directory where the tarball will be created
 - **`-UseHardLinks`** (switch) - Use hard links instead of symbolic links
-- **`-Verbose`** (switch) - Enable verbose deduplication output
+- **`-VerboseOutput`** (switch) - Enable verbose deduplication output
 
 ### Workflow
 
