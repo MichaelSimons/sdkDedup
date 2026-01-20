@@ -73,10 +73,6 @@ try {
         throw "SDK folder not found at: $sdkFolder"
     }
 
-    # Get size before deduplication
-    $sizeBefore = (Get-ChildItem -Path $sdkFolder -Recurse -File | Measure-Object -Property Length -Sum).Sum
-    Write-Host "SDK size before deduplication: $([math]::Round($sizeBefore / 1MB, 2)) MB"
-
     # Run deduplication on the sdk folder only
     Write-Host ""
     Write-Host "Running deduplication on sdk folder..." -ForegroundColor Yellow
@@ -101,19 +97,24 @@ try {
         $sdkDedupPath = Join-Path $PSScriptRoot "bin\Release\net10.0\sdkDedup.dll"
     }
 
-    & dotnet $sdkDedupPath @dedupArgs
+    # Capture deduplication output to parse space savings
+    $dedupOutput = & dotnet $sdkDedupPath @dedupArgs 2>&1 | Out-String
+    Write-Host $dedupOutput
 
     if ($LASTEXITCODE -ne 0) {
         throw "Deduplication failed with exit code $LASTEXITCODE"
     }
 
-    Write-Host "Deduplication complete." -ForegroundColor Green
-
-    # Get size after deduplication
-    $sizeAfter = (Get-ChildItem -Path $sdkFolder -Recurse -File | Measure-Object -Property Length -Sum).Sum
-    $savings = $sizeBefore - $sizeAfter
-    Write-Host "SDK size after deduplication: $([math]::Round($sizeAfter / 1MB, 2)) MB"
-    Write-Host "Space saved: $([math]::Round($savings / 1MB, 2)) MB" -ForegroundColor Green
+    # Parse the space savings from the deduplication output
+    # Output format: "Deduplication complete: X files replaced with hard links, saving Y.YY MB."
+    if ($dedupOutput -match 'saving\s+([\d.]+)\s+MB') {
+        $spaceSavedMB = [decimal]$matches[1]
+        Write-Host ""
+        Write-Host "Space saved by deduplication: $spaceSavedMB MB" -ForegroundColor Green
+    } else {
+        Write-Host ""
+        Write-Host "Could not parse space savings from deduplication output" -ForegroundColor Yellow
+    }
 
     # Get total dotnet installation size
     $totalSize = (Get-ChildItem -Path $copyDest -Recurse -File | Measure-Object -Property Length -Sum).Sum

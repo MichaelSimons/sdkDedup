@@ -151,12 +151,11 @@ The `Deduplicate-And-Package.ps1` script provides an end-to-end workflow for cre
 
 1. Creates a temporary working directory
 2. Copies the entire dotnet installation to the working directory
-3. Measures the sdk folder size before deduplication
-4. Runs the deduplication tool on the sdk folder only
-5. Measures the sdk folder size after deduplication and reports savings
-6. Creates a compressed tarball of the entire dotnet installation using `tar -czf`
-7. Verifies the tarball contents
-8. Cleans up the temporary directory
+3. Runs the deduplication tool on the sdk folder only
+4. Reports space savings from deduplication (parsed from tool output)
+5. Creates a compressed tarball of the entire dotnet installation using `tar -czf`
+6. Verifies the tarball contents
+7. Cleans up the temporary directory
 
 ### Output
 
