@@ -62,17 +62,38 @@ Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
 # Windows-specific information
 if ($IsWindows -or $env:OS -eq "Windows_NT") {
     try {
-        $productName = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "ProductName" -ErrorAction SilentlyContinue
-        $editionId = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "EditionID" -ErrorAction SilentlyContinue
-        $currentBuild = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "CurrentBuild" -ErrorAction SilentlyContinue
-        $releaseId = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "ReleaseId" -ErrorAction SilentlyContinue
-        $displayVersion = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "DisplayVersion" -ErrorAction SilentlyContinue
-
-        if ($productName) { Write-Host "Windows Product: $productName" }
-        if ($editionId) { Write-Host "Windows Edition: $editionId" }
-        if ($currentBuild) { Write-Host "Windows Build: $currentBuild" }
-        if ($releaseId) { Write-Host "Windows Release: $releaseId" }
-        if ($displayVersion) { Write-Host "Windows Display Version: $displayVersion" }
+        $buildInfo = Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -ErrorAction SilentlyContinue
+        
+        if ($buildInfo.ProductName) { Write-Host "Windows Product: $($buildInfo.ProductName)" }
+        if ($buildInfo.EditionID) { Write-Host "Windows Edition: $($buildInfo.EditionID)" }
+        if ($buildInfo.CurrentBuild) { Write-Host "Windows Build: $($buildInfo.CurrentBuild)" }
+        if ($buildInfo.ReleaseId) { Write-Host "Windows Release: $($buildInfo.ReleaseId)" }
+        if ($buildInfo.DisplayVersion) { Write-Host "Windows Display Version: $($buildInfo.DisplayVersion)" }
+        
+        # Detailed build information for patch level identification
+        if ($buildInfo.CurrentBuild -and $buildInfo.UBR) { 
+            Write-Host "Full Build Version: $($buildInfo.CurrentBuild).$($buildInfo.UBR)" -ForegroundColor Green
+        }
+        if ($buildInfo.BuildBranch) { Write-Host "Build Branch: $($buildInfo.BuildBranch)" }
+        if ($buildInfo.BuildLab) { Write-Host "Build Lab: $($buildInfo.BuildLab)" }
+        if ($buildInfo.BuildLabEx) { Write-Host "Build Lab Ex: $($buildInfo.BuildLabEx)" }
+        if ($buildInfo.UBR) { Write-Host "UBR (Update Build Revision): $($buildInfo.UBR)" -ForegroundColor Cyan }
+        
+        # Check installed Windows updates
+        Write-Host "`nRecent Windows Updates:" -ForegroundColor Yellow
+        try {
+            $recentUpdates = Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 5
+            if ($recentUpdates) {
+                $recentUpdates | ForEach-Object {
+                    Write-Host "  $($_.HotFixID) - $($_.Description) - $($_.InstalledOn)" -ForegroundColor White
+                }
+            } else {
+                Write-Host "  No hotfix information available" -ForegroundColor Gray
+            }
+        }
+        catch {
+            Write-Host "  Could not retrieve hotfix information: $_" -ForegroundColor Yellow
+        }
     }
     catch {
         Write-Host "Could not retrieve Windows registry information: $_" -ForegroundColor Yellow
