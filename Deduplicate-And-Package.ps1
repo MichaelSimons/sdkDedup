@@ -50,9 +50,40 @@ Write-Host "Source SDK: $SourceSdkPath"
 Write-Host "Output: $OutputPath"
 Write-Host ""
 
+# Display environment information
+Write-Host "=== ENVIRONMENT INFO ===" -ForegroundColor Cyan
+
+# OS Information
+Write-Host "OS: $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription)"
+Write-Host "OS Architecture: $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
+Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
+
+# Windows-specific information
+if ($IsWindows -or $env:OS -eq "Windows_NT") {
+    try {
+        $productName = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "ProductName" -ErrorAction SilentlyContinue
+        $editionId = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "EditionID" -ErrorAction SilentlyContinue
+        $currentBuild = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "CurrentBuild" -ErrorAction SilentlyContinue
+        $releaseId = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "ReleaseId" -ErrorAction SilentlyContinue
+        $displayVersion = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name "DisplayVersion" -ErrorAction SilentlyContinue
+
+        if ($productName) { Write-Host "Windows Product: $productName" }
+        if ($editionId) { Write-Host "Windows Edition: $editionId" }
+        if ($currentBuild) { Write-Host "Windows Build: $currentBuild" }
+        if ($releaseId) { Write-Host "Windows Release: $releaseId" }
+        if ($displayVersion) { Write-Host "Windows Display Version: $displayVersion" }
+    }
+    catch {
+        Write-Host "Could not retrieve Windows registry information: $_" -ForegroundColor Yellow
+    }
+}
+
 # Display tar version
+Write-Host ""
 Write-Host "Tar version:" -ForegroundColor Yellow
 & tar --version | Select-Object -First 1 | ForEach-Object { Write-Host "  $_" }
+
+Write-Host "=== END ENVIRONMENT INFO ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Create a temporary working directory
