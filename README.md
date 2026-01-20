@@ -71,13 +71,13 @@ sdkDedup /usr/share/dotnet --verbose
 The `Deduplicate-And-Package.ps1` script automates the full workflow:
 
 ```powershell
-.\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet\sdk\10.0.100" -OutputPath "C:\output" -UseHardLinks
+.\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet" -OutputPath "C:\output" -UseHardLinks
 ```
 
 This will:
-1. Copy the SDK layout to a temporary directory
-2. Run deduplication on the copy
-3. Create a tarball of the deduplicated SDK
+1. Copy the entire dotnet installation to a temporary directory
+2. Run deduplication on the sdk folder within the copy
+3. Create a tarball of the entire dotnet installation (with deduplicated sdk)
 4. Clean up the temporary directory
 
 ### Using Docker (Windows containers)
@@ -86,12 +86,12 @@ This will:
 
 Windows Server 2022:
 ```bash
-docker run --rm -v C:\output:C:\output sdkdedup:ltsc2022 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet\sdk\10.0.100" -OutputPath C:\output -UseHardLinks
+docker run --rm -v C:\output:C:\output sdkdedup:ltsc2022 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet" -OutputPath C:\output -UseHardLinks
 ```
 
 Windows Server 2025:
 ```bash
-docker run --rm -v C:\output:C:\output sdkdedup:ltsc2025 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet\sdk\10.0.100" -OutputPath C:\output -UseHardLinks
+docker run --rm -v C:\output:C:\output sdkdedup:ltsc2025 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet" -OutputPath C:\output -UseHardLinks
 ```
 
 **Or run the deduplication tool directly:**
@@ -142,7 +142,7 @@ The `Deduplicate-And-Package.ps1` script provides an end-to-end workflow for cre
 
 ### Parameters
 
-- **`-SourceSdkPath`** (required) - Path to the source SDK installation
+- **`-SourceSdkPath`** (required) - Path to the source dotnet installation root
 - **`-OutputPath`** (required) - Directory where the tarball will be created
 - **`-UseHardLinks`** (switch) - Use hard links instead of symbolic links
 - **`-VerboseOutput`** (switch) - Enable verbose deduplication output
@@ -150,17 +150,17 @@ The `Deduplicate-And-Package.ps1` script provides an end-to-end workflow for cre
 ### Workflow
 
 1. Creates a temporary working directory
-2. Copies the SDK layout to the working directory
-3. Measures the size before deduplication
-4. Runs the deduplication tool
-5. Measures the size after deduplication and reports savings
-6. Creates a compressed tarball using `tar -czf`
+2. Copies the entire dotnet installation to the working directory
+3. Measures the sdk folder size before deduplication
+4. Runs the deduplication tool on the sdk folder only
+5. Measures the sdk folder size after deduplication and reports savings
+6. Creates a compressed tarball of the entire dotnet installation using `tar -czf`
 7. Verifies the tarball contents
 8. Cleans up the temporary directory
 
 ### Output
 
-The script creates a tarball named `dotnet-sdk-{version}-deduplicated.tar.gz` in the specified output directory.
+The script creates a tarball named `dotnet-deduplicated-{timestamp}.tar.gz` in the specified output directory.
 
 ## Based On
 

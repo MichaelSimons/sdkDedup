@@ -19,7 +19,7 @@ WORKDIR /output
 # docker build -f Dockerfile.ltsc2022 -t sdkdedup:ltsc2022 .
 #
 # Run deduplication and create tarball:
-# docker run --rm -v C:\output:C:\output sdkdedup:ltsc2022 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet\sdk\10.0.100" -OutputPath C:\output -UseHardLinks
+# docker run --rm -v C:\output:C:\output sdkdedup:ltsc2022 pwsh C:\app\Deduplicate-And-Package.ps1 -SourceSdkPath "C:\Program Files\dotnet" -OutputPath C:\output -UseHardLinks
 #
 # Or run the tool directly:
 # docker run --rm sdkdedup:ltsc2022 dotnet C:\app\bin\Release\net10.0\sdkDedup.dll C:\path\to\sdk --hard-links
